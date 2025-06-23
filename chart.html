@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard with ECharts</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <style>
+    .chart {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📊 Clustered Bar Chart</h2>
+  <div id="clusterChart" class="chart"></div>
+
+  <h2>📈 Quantity (Bar) + Price Paid (Line)</h2>
+  <div id="comboChart" class="chart"></div>
+
+  <script>
+    // 加载 Clustered Bar Chart 数据
+    fetch('./clustered_chart_data.json')
+      .then(res => res.json())
+      .then(data => {
+        const x = data.map(d => d["Product name"]);
+        const price = data.map(d => d["List Price per unit"]);
+        const cost = data.map(d => d["Production costs per unit"]);
+
+        const chart = echarts.init(document.getElementById('clusterChart'));
+        chart.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['List Price', 'Production Cost'] },
+          xAxis: { type: 'category', data: x },
+          yAxis: { type: 'value' },
+          series: [
+            { name: 'List Price', type: 'bar', data: price },
+            { name: 'Production Cost', type: 'bar', data: cost }
+          ]
+        });
+      });
+
+    // 加载 Combo Chart 数据
+    fetch('./combo_chart_data.json')
+      .then(res => res.json())
+      .then(data => {
+        const x = data.map(d => d["Product Name"]);
+        const quantity = data.map(d => d["Quantity"]);
+        const price = data.map(d => d["Price Paid"]);
+
+        const chart = echarts.init(document.getElementById('comboChart'));
+        chart.setOption({
+          tooltip: { trigger: 'axis' },
+          legend: { data: ['Quantity', 'Price Paid'] },
+          xAxis: { type: 'category', data: x },
+          yAxis: [
+            { type: 'value', name: 'Quantity' },
+            { type: 'value', name: 'Price Paid' }
+          ],
+          series: [
+            { name: 'Quantity', type: 'bar', data: quantity },
+            {
+              name: 'Price Paid',
+              type: 'line',
+              yAxisIndex: 1,
+              data: price
+            }
+          ]
+        });
+      });
+  </script>
+</body>
+</html>
